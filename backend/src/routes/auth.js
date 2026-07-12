@@ -21,10 +21,10 @@ router.post('/register', async (req, res) => {
 
     // Create user
     const { data: user, error } = await supabase.from('users').insert({ username, email, password: hashedPassword, role: 'user' }).select('id, username, email, role, avatar').single();
-    if (error) return res.status(500).json({ message: error.message });
+    if (error) return res.status(500).json({ message: 'Database error: ' + error.message });
 
-    res.status(201).json({ _id: user.id, username: user.username, email: user.email, role: user.role, avatar: user.avatar, token: genToken(user.id) });
-  } catch (e) { res.status(500).json({ message: e.message }); }
+    res.status(201).json({ _id: user.id, username: user.username, email: user.email, role: user.role, avatar: user.avatar || '', token: genToken(user.id) });
+  } catch (e) { res.status(500).json({ message: 'Server error: ' + e.message }); }
 });
 
 router.post('/login', async (req, res) => {
@@ -32,14 +32,15 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: 'All fields required' });
 
-    const { data: user } = await supabase.from('users').select('*').eq('email', email).single();
-    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+    const { data: user, error } = await supabase.from('users').select('*').eq('email', email).single();
+    if (error || !user) return res.status(401).json({ message: 'Invalid credentials - user not found' });
+    if (!user.password) return res.status(401).json({ message: 'Invalid credentials - no password set' });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials - wrong password' });
 
-    res.json({ _id: user.id, username: user.username, email: user.email, role: user.role, avatar: user.avatar, token: genToken(user.id) });
-  } catch (e) { res.status(500).json({ message: e.message }); }
+    res.json({ _id: user.id, username: user.username, email: user.email, role: user.role, avatar: user.avatar || '', token: genToken(user.id) });
+  } catch (e) { res.status(500).json({ message: 'Server error: ' + e.message }); }
 });
 
 router.get('/profile', protect, async (req, res) => {

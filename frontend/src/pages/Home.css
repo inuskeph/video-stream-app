@@ -1,0 +1,16 @@
+.home{padding-bottom:40px}
+.hero{padding:80px 0 60px;background:linear-gradient(135deg,var(--bg-dark),var(--bg-surface),var(--bg-dark));position:relative}
+.hero-content{max-width:700px}
+.hero-title{font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.2;margin-bottom:16px}
+.gradient-text{background:linear-gradient(135deg,var(--primary),#ff6b81,#ffa502);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-subtitle{font-size:18px;color:var(--text-secondary);margin-bottom:30px}
+.hero-actions{display:flex;gap:12px;margin-bottom:40px}
+.hero-stats{display:flex;gap:40px}
+.stat{display:flex;flex-direction:column}.stat-num{font-size:24px;font-weight:700;color:var(--primary)}.stat-label{font-size:13px;color:var(--text-muted)}
+.section{padding:40px 0}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.section-header h2{font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px}
+.section-icon{color:var(--primary)}
+.see-all{color:var(--primary);font-size:14px;font-weight:600}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+@media(max-width:768px){.hero{padding:50px 0 40px}.video-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}}

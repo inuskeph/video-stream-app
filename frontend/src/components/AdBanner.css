@@ -1,0 +1,10 @@
+.ad-wrapper{position:relative;margin:16px 0}
+.ad-label{position:absolute;top:4px;left:8px;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;z-index:1}
+.ad-placeholder{background:linear-gradient(135deg,var(--bg-card),var(--bg-surface));border:1px dashed var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+.ad-placeholder:hover{border-color:var(--primary)}
+.ad-placeholder-content{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ad-icon{font-size:24px}
+.ad-text{color:var(--text-secondary);font-size:13px;font-weight:600}
+.ad-note{color:var(--text-muted);font-size:11px}
+.ad-banner{display:flex;justify-content:center}
+@media(max-width:768px){.ad-banner .ad-placeholder{max-width:100%;height:60px}}

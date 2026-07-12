@@ -1,0 +1,10 @@
+.upload-page{padding:40px 0}
+.upload-card{max-width:700px;margin:0 auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:40px}
+.upload-header{text-align:center;margin-bottom:32px}
+.upload-header h1{font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.upload-form{display:flex;flex-direction:column;gap:20px}
+.upload-form textarea{resize:vertical;min-height:100px;padding:12px;background:var(--bg-dark);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px}
+.upload-form select{padding:12px;background:var(--bg-dark);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-help{font-size:11px;color:var(--text-muted);margin-top:4px}
+@media(max-width:768px){.upload-card{padding:24px}.form-row{grid-template-columns:1fr}}

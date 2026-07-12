@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FiStar, FiCalendar, FiFilm, FiArrowLeft, FiExternalLink, FiPlay, FiTv } from 'react-icons/fi';
+import { FiStar, FiCalendar, FiFilm, FiArrowLeft, FiExternalLink, FiPlay, FiTv, FiX } from 'react-icons/fi';
 import AdBanner from '../components/AdBanner';
 import './Anime.css';
 
@@ -10,6 +10,8 @@ function AnimeDetail() {
   const [episodes, setEpisodes] = useState([]);
   const [streaming, setStreaming] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeVideo, setActiveVideo] = useState(null); // YouTube embed search query
+  const [showPlayer, setShowPlayer] = useState(false);
 
   useEffect(() => { loadAnime(); window.scrollTo(0, 0); }, [id]);
 
@@ -20,9 +22,14 @@ function AnimeDetail() {
       const data = await res.json();
       setAnime(data.data);
 
-      // Get streaming links
       if (data.data?.streaming) {
         setStreaming(data.data.streaming);
+      }
+
+      // Auto-play trailer if available
+      if (data.data?.trailer?.youtube_id) {
+        setActiveVideo(data.data.trailer.youtube_id);
+        setShowPlayer(true);
       }
 
       await new Promise(r => setTimeout(r, 1000));
@@ -34,24 +41,38 @@ function AnimeDetail() {
     finally { setLoading(false); }
   };
 
-  // Generate streaming links based on anime title
+  const playEpisode = (epNum) => {
+    const query = `${anime.title} episode ${epNum}`;
+    setActiveVideo(null);
+    setShowPlayer(true);
+    // Use YouTube search embed
+    setActiveVideo(`search_${encodeURIComponent(query)}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const playTrailer = () => {
+    if (anime?.trailer?.youtube_id) {
+      setActiveVideo(anime.trailer.youtube_id);
+      setShowPlayer(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const getStreamingLinks = () => {
     if (!anime) return [];
     const title = encodeURIComponent(anime.title);
     const links = [
-      { name: 'Crunchyroll', url: `https://www.crunchyroll.com/search?q=${title}`, icon: '🍥', color: '#f47521' },
-      { name: 'YouTube', url: `https://www.youtube.com/results?search_query=${title}+full+episode`, icon: '▶️', color: '#ff0000' },
-      { name: 'Netflix', url: `https://www.netflix.com/search?q=${encodeURIComponent(anime.title)}`, icon: '🎬', color: '#e50914' },
-      { name: 'Hulu', url: `https://www.hulu.com/search?q=${title}`, icon: '📺', color: '#1ce783' },
-      { name: 'Funimation', url: `https://www.funimation.com/search/?q=${title}`, icon: '🌟', color: '#5b0bb5' },
-      { name: 'Amazon Prime', url: `https://www.amazon.com/s?k=${title}+anime&i=instant-video`, icon: '📦', color: '#00a8e1' }
+      { name: 'Crunchyroll', url: `https://www.crunchyroll.com/search?q=${title}`, icon: '🍥' },
+      { name: 'Netflix', url: `https://www.netflix.com/search?q=${encodeURIComponent(anime.title)}`, icon: '🎬' },
+      { name: 'Hulu', url: `https://www.hulu.com/search?q=${title}`, icon: '📺' },
+      { name: 'Funimation', url: `https://www.funimation.com/search/?q=${title}`, icon: '🌟' },
+      { name: 'Amazon Prime', url: `https://www.amazon.com/s?k=${title}+anime&i=instant-video`, icon: '📦' }
     ];
 
-    // Add official streaming links from Jikan API
     if (streaming.length > 0) {
       streaming.forEach(s => {
         if (!links.find(l => l.name.toLowerCase() === s.name.toLowerCase())) {
-          links.unshift({ name: s.name, url: s.url, icon: '🔗', color: 'var(--primary)', official: true });
+          links.unshift({ name: s.name, url: s.url, icon: '🔗', official: true });
         }
       });
     }
@@ -64,20 +85,58 @@ function AnimeDetail() {
 
   const streamingLinks = getStreamingLinks();
 
+  // Get YouTube embed URL
+  const getEmbedUrl = () => {
+    if (!activeVideo) return '';
+    if (activeVideo.startsWith('search_')) {
+      const query = activeVideo.replace('search_', '');
+      return `https://www.youtube.com/embed?listType=search&list=${query}`;
+    }
+    return `https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0`;
+  };
+
   return (
     <div className="anime-detail-page">
       <div className="container">
         <Link to="/anime" className="back-link"><FiArrowLeft /> Back to Anime</Link>
 
+        {/* YouTube Embedded Player */}
+        {showPlayer && (
+          <div className="anime-player-section">
+            <div className="anime-player-header">
+              <h2><FiPlay /> Now Playing: {anime.title}</h2>
+              <button className="close-player-btn" onClick={() => setShowPlayer(false)}><FiX size={20} /></button>
+            </div>
+            <div className="anime-player-wrapper">
+              <iframe
+                src={getEmbedUrl()}
+                title={anime.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            <AdBanner type="in-feed" />
+          </div>
+        )}
+
         <div className="anime-detail-layout">
           {/* Poster */}
           <div className="anime-poster">
             <img src={anime.images?.jpg?.large_image_url} alt={anime.title} />
-            {anime.trailer?.url && (
-              <a href={anime.trailer.url} target="_blank" rel="noopener noreferrer" className="btn btn-primary trailer-btn">
+            {anime.trailer?.youtube_id && (
+              <button onClick={playTrailer} className="btn btn-primary trailer-btn">
                 <FiFilm /> Watch Trailer
-              </a>
+              </button>
             )}
+            {/* Quick play button */}
+            <button
+              onClick={() => playEpisode(1)}
+              className="btn btn-secondary trailer-btn"
+              style={{ marginTop: '8px' }}
+            >
+              <FiPlay /> Watch Episode 1
+            </button>
           </div>
 
           {/* Info */}
@@ -102,8 +161,8 @@ function AnimeDetail() {
 
             {/* WATCH NOW - Streaming Links */}
             <div className="streaming-section">
-              <h3><FiTv /> Watch This Anime</h3>
-              <p className="streaming-note">Choose a legal streaming platform:</p>
+              <h3><FiTv /> Watch on Other Platforms</h3>
+              <p className="streaming-note">Also available on these legal platforms:</p>
               <div className="streaming-links">
                 {streamingLinks.map((link, i) => (
                   <a
@@ -150,36 +209,29 @@ function AnimeDetail() {
 
             <AdBanner type="banner" />
 
-            {/* Episodes */}
+            {/* Episodes - Click to play on site */}
             {episodes.length > 0 && (
               <div className="anime-episodes">
                 <h3><FiPlay /> Episodes ({anime.episodes || episodes.length})</h3>
+                <p className="streaming-note">Click an episode to watch on this page:</p>
                 <div className="episodes-list">
-                  {episodes.slice(0, 24).map(ep => (
-                    <a
+                  {episodes.slice(0, 50).map(ep => (
+                    <button
                       key={ep.mal_id}
-                      href={`https://www.youtube.com/results?search_query=${encodeURIComponent(anime.title)}+episode+${ep.mal_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={() => playEpisode(ep.mal_id)}
                       className="episode-item"
                     >
                       <span className="ep-number">EP {ep.mal_id}</span>
                       <span className="ep-title">{ep.title || `Episode ${ep.mal_id}`}</span>
-                      <FiExternalLink size={12} className="ep-link-icon" />
-                    </a>
+                      <FiPlay size={12} className="ep-link-icon" />
+                    </button>
                   ))}
                 </div>
-                {episodes.length > 24 && <p className="more-eps">+ {episodes.length - 24} more episodes</p>}
+                {episodes.length > 50 && <p className="more-eps">+ {episodes.length - 50} more episodes</p>}
               </div>
             )}
 
             <AdBanner type="in-feed" />
-
-            {/* Related/Recommendations placeholder */}
-            <div className="streaming-section" style={{ marginTop: '30px' }}>
-              <h3>📢 Support the Creators</h3>
-              <p className="streaming-note">Watch anime legally to support the studios that make your favorite shows! Subscribe to official platforms for the best quality and latest episodes.</p>
-            </div>
           </div>
         </div>
 

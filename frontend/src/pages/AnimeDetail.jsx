@@ -4,7 +4,7 @@ import { FiStar, FiCalendar, FiFilm, FiArrowLeft, FiExternalLink, FiPlay, FiTv, 
 import AdBanner from '../components/AdBanner';
 import './Anime.css';
 
-const YT_API_KEY = 'AIzaSyBDaWlq5REpmNMlSf7X7BaCD-IEuqoFOaw';
+const YT_API_KEY = 'AIzaSyDOwiN7ODgGb4wLcAT7ntn6bXmLrsZDGWQ';
 
 function AnimeDetail() {
   const { id } = useParams();

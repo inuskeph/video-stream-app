@@ -8,6 +8,8 @@ import Browse from './pages/Browse';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Upload from './pages/Upload';
+import Anime from './pages/Anime';
+import AnimeDetail from './pages/AnimeDetail';
 function App() {
   return (<div className="app">
     <Toaster position="top-right" toastOptions={{style:{background:'#1a1a2e',color:'#fff',border:'1px solid #2d2d4e'}}}/>
@@ -17,6 +19,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/browse" element={<Browse />} />
         <Route path="/video/:id" element={<VideoPlayer />} />
+        <Route path="/anime" element={<Anime />} />
+        <Route path="/anime/:id" element={<AnimeDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/upload" element={<Upload />} />

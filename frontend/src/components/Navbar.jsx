@@ -15,6 +15,7 @@ function Navbar() {
     <form className="navbar-search" onSubmit={search}><input type="text" placeholder="Search videos..." value={q} onChange={e=>setQ(e.target.value)}/><button type="submit" className="search-btn"><FiSearch size={18}/></button></form>
     <div className={`navbar-links ${open?'active':''}`}>
       <Link to="/browse" className="nav-link" onClick={()=>setOpen(false)}>Browse</Link>
+      <Link to="/anime" className="nav-link" onClick={()=>setOpen(false)}>Anime</Link>
       {isAuthenticated ? (<>
         {(user.role==='admin'||user.role==='creator')&&<Link to="/upload" className="nav-link"><FiUpload/> Upload</Link>}
         <div className="nav-user"><FiUser/><span>{user.username}</span></div>

@@ -1,27 +1,49 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const supabase = require('../config/db');
 const { protect } = require('../middleware/auth');
 const router = express.Router();
+
 const genToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    if (await User.findOne({ $or: [{ email }, { username }] })) return res.status(400).json({ message: 'User exists' });
-    const user = await User.create({ username, email, password });
-    res.status(201).json({ _id: user._id, username: user.username, email: user.email, role: user.role, token: genToken(user._id) });
+    if (!username || !email || !password) return res.status(400).json({ message: 'All fields required' });
+
+    // Check if user exists
+    const { data: existing } = await supabase.from('users').select('id').or(`email.eq.${email},username.eq.${username}`).limit(1);
+    if (existing && existing.length > 0) return res.status(400).json({ message: 'User already exists' });
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const { data: user, error } = await supabase.from('users').insert({ username, email, password: hashedPassword, role: 'user' }).select('id, username, email, role, avatar').single();
+    if (error) return res.status(500).json({ message: error.message });
+
+    res.status(201).json({ _id: user.id, username: user.username, email: user.email, role: user.role, avatar: user.avatar, token: genToken(user.id) });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user || !(await user.comparePassword(password))) return res.status(401).json({ message: 'Invalid credentials' });
-    res.json({ _id: user._id, username: user.username, email: user.email, role: user.role, token: genToken(user._id) });
+    if (!email || !password) return res.status(400).json({ message: 'All fields required' });
+
+    const { data: user } = await supabase.from('users').select('*').eq('email', email).single();
+    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+
+    res.json({ _id: user.id, username: user.username, email: user.email, role: user.role, avatar: user.avatar, token: genToken(user.id) });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-router.get('/profile', protect, async (req, res) => { res.json(await User.findById(req.user._id).select('-password')); });
+router.get('/profile', protect, async (req, res) => {
+  res.json(req.user);
+});
+
 module.exports = router;

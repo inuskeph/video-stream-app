@@ -16,6 +16,8 @@ function Navbar() {
     <div className={`navbar-links ${open?'active':''}`}>
       <Link to="/browse" className="nav-link" onClick={()=>setOpen(false)}>Browse</Link>
       <Link to="/anime" className="nav-link" onClick={()=>setOpen(false)}>Anime</Link>
+      <Link to="/movies" className="nav-link" onClick={()=>setOpen(false)}>Movies</Link>
+      <Link to="/live" className="nav-link" onClick={()=>setOpen(false)}>Live TV</Link>
       {isAuthenticated ? (<>
         {(user.role==='admin'||user.role==='creator')&&<Link to="/upload" className="nav-link"><FiUpload/> Upload</Link>}
         <div className="nav-user"><FiUser/><span>{user.username}</span></div>

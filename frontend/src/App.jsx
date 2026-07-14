@@ -10,6 +10,8 @@ import Register from './pages/Register';
 import Upload from './pages/Upload';
 import Anime from './pages/Anime';
 import AnimeDetail from './pages/AnimeDetail';
+import Movies from './pages/Movies';
+import LiveTV from './pages/LiveTV';
 function App() {
   return (<div className="app">
     <Toaster position="top-right" toastOptions={{style:{background:'#1a1a2e',color:'#fff',border:'1px solid #2d2d4e'}}}/>
@@ -21,6 +23,8 @@ function App() {
         <Route path="/video/:id" element={<VideoPlayer />} />
         <Route path="/anime" element={<Anime />} />
         <Route path="/anime/:id" element={<AnimeDetail />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/live" element={<LiveTV />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/upload" element={<Upload />} />

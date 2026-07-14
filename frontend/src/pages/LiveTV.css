@@ -1,0 +1,24 @@
+.livetv-page{padding:30px 0 60px}
+.livetv-header{margin-bottom:24px}
+.livetv-header h1{font-size:32px;font-weight:800;display:flex;align-items:center;gap:10px}
+.livetv-header p{color:var(--text-secondary);font-size:15px;margin-top:4px}
+.live-badge{display:inline-flex;align-items:center;gap:4px;background:#e50914;color:white;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.livetv-categories{display:flex;gap:10px;margin-bottom:24px;overflow-x:auto;padding:8px 0}
+.livetv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:30px}
+.channel-card{border-radius:var(--radius);overflow:hidden;background:var(--bg-card);border:1px solid var(--border);cursor:pointer;transition:var(--transition)}
+.channel-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--primary)}
+.channel-card.active{border-color:var(--primary);box-shadow:0 0 20px rgba(255,71,87,0.3)}
+.channel-card-img{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--bg-surface)}
+.channel-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s}
+.channel-card:hover .channel-card-img img{transform:scale(1.05)}
+.channel-live-badge{position:absolute;top:8px;left:8px;background:#e50914;color:white;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px}
+.channel-live-dot{width:6px;height:6px;background:white;border-radius:50%;animation:pulse 1.5s infinite}
+.channel-card-overlay{position:absolute;inset:0;background:rgba(255,71,87,0.8);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;color:white}
+.channel-card:hover .channel-card-overlay{opacity:1}
+.channel-card-body{padding:14px}
+.channel-card-body h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.channel-category{font-size:12px;color:var(--primary);font-weight:600}
+.channel-desc{font-size:13px;color:var(--text-muted);margin-top:4px}
+.channel-viewers{font-size:11px;color:var(--text-muted);margin-top:6px;display:flex;align-items:center;gap:4px}
+@media(max-width:768px){.livetv-grid{grid-template-columns:1fr}}
